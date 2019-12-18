@@ -3,7 +3,7 @@ from setuptools import setup
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-setup(name='gym-grid',
+setup(name='gym_pygrid',
 	  version='0.0.1',
 	  author="Ruoqi Zhang",
 	  author_email="ruoqi.zhang.666@gmail.com",

@@ -8,6 +8,6 @@
 */__pycache__
 __pycache__/
 # pip
-gym_grid.egg-info/
+*.egg-info/
 build/
 dist/

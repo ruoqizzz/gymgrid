@@ -1,4 +1,4 @@
-# gym-gridworld
+# gym_pygrid
 
 The gridworld environment contains simple environments in RL book and compatible with OpenAI-gym.
 
@@ -14,6 +14,6 @@ pip install -r requirements.txt
 
 ```
 import gym
-import 
+import gym_pygrid
 ```
 
