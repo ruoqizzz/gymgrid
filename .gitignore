@@ -3,3 +3,11 @@
 
 # pyenv
 .python-version
+
+# python
+*/__pycache__
+__pycache__/
+# pip
+gym_grid.egg-info/
+build/
+dist/
