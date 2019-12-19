@@ -4,7 +4,7 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setup(name='gym_pygrid',
-	  version='0.0.1',
+	  version='0.0.2',
 	  author="Ruoqi Zhang",
 	  author_email="ruoqi.zhang.666@gmail.com",
 	  long_description=long_description,

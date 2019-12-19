@@ -8,8 +8,6 @@ The gridworld environment contains simple environments in RL book and compatible
 pip install -r requirements.txt
 ```
 
-
-
 ## Usage
 
 ```
@@ -17,3 +15,8 @@ import gym
 import gym_pygrid
 ```
 
+## Environments
+
+- Sample1
+- Sample2
+- Cliff

@@ -13,7 +13,8 @@ class GridWorld(gym.Env):
 					   unit_pixel=40,
 					   default_reward=-1,
 					   goal_reward=100,
-					   punish_reward=-10):
+					   punish_reward=-10,
+					   windy = False):
 		super(GridWorld, self).__init__()
 		self.world_width = world_width
 		self.world_height = world_height
@@ -67,14 +68,16 @@ class GridWorld(gym.Env):
 				rect.set_color(0,0,0)
 				self.viewer.add_geom(rect)
 			# Draw goal: yellow oval
-			self.goal = rendering.make_circle((unit_pixel-2*gap)/2)
-			self.goal.set_color(1,1,0) # yellow
-			goal_x, goal_y = self.goal_grid[0] 
-			goal_location = origin + np.array([unit_pixel*goal_x, unit_pixel*goal_y])
-			circletrans = rendering.Transform(translation=(goal_location[0],goal_location[1]))
-			self.goal.add_attr(circletrans)
-			self.viewer.add_geom(self.goal)
-
+			self.goals = []
+			for i in range(len(self.goal_grid)):
+				goal = rendering.make_circle((unit_pixel-2*gap)/2)
+				goal.set_color(1,1,0) # yellow
+				goal_x, goal_y = self.goal_grid[i] 
+				goal_location = origin + np.array([unit_pixel*goal_x, unit_pixel*goal_y])
+				circletrans = rendering.Transform(translation=(goal_location[0],goal_location[1]))
+				goal.add_attr(circletrans)
+				self.viewer.add_geom(goal)
+				self.goals.append(goal)
 			# Draw agent: red rect
 			agent_stlocation = [(gap,gap),
 								(unit_pixel-gap, gap),
@@ -111,7 +114,7 @@ class GridWorld(gym.Env):
 		if new_y < 0: new_y = 0
 		if new_y >= self.world_height: new_y = self.world_height-1
 
-		if (new_x, new_y) == self.goal_grid[0]:
+		if (new_x, new_y) in self.goal_grid:
 			done = True
 			reward = self.goal_reward
 		elif (new_x, new_y) in self.punish_grids:
@@ -138,8 +141,8 @@ class GridWorld(gym.Env):
 	def add_punish(self,x,y):
 		self.punish_grids.append((x,y))
 
-	def set_goal(self,x,y):
-		self.goal_grid = [(x,y)]
+	def add_goal(self,x,y):
+		self.goal_grid.append((x,y))
 
 	def set_start(self,x,y):
 		self.start_grid = [(x,y)]
