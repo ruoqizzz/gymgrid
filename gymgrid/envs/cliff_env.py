@@ -2,15 +2,29 @@ import gym
 import numpy as np
 from gym.envs.classic_control import rendering
 from gymgrid.envs.general_grid import *
+import time
 
-def Cliff():
-    env = GridWorld()
-    env.action_space = gym.spaces.Discrete(4)
-    env.goal_grid = [(11,0)]
-    for i in range(1,11):
-        env.add_punish(i,0)
-    return env
+class Cliff(GridWorld):
+    """docstring for Cliff"""
+    def __init__(self, world_width=12, 
+                       world_height=4, 
+                       unit_pixel=40,
+                       default_reward=-1,
+                       goal_reward=100,
+                       punish_reward=-10,
+                       windy = False):
+        super().__init__(world_width, 
+                       world_height, 
+                       unit_pixel,
+                       default_reward,
+                       goal_reward,
+                       punish_reward,
+                       windy)
+        self.goal_grid = [(11,0)]
+        for i in range(1,11):
+            self.add_punish(i,0)
 
+        
 
 if __name__ == '__main__':
     env = Cliff()
@@ -29,6 +43,7 @@ if __name__ == '__main__':
             observation, reward, done, info = env.step(action)
             if done:
                 print("Episode finished after {} timesteps".format(t+1))
+                time.sleep(0.3)
                 break
     env.close()
     print("env closed")

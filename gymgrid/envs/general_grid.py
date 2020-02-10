@@ -79,10 +79,12 @@ class GridWorld(gym.Env):
 				self.viewer.add_geom(goal)
 				self.goals.append(goal)
 			# Draw agent: red rect
-			agent_stlocation = [(gap,gap),
-								(unit_pixel-gap, gap),
-								(unit_pixel-gap, unit_pixel-gap),
-								(gap, unit_pixel-gap)]
+			startx = self.start_grid[0][0]
+			starty = self.start_grid[0][1]
+			agent_stlocation = [(gap+startx*unit_pixel,gap+starty*unit_pixel),
+								(unit_pixel-gap+startx*unit_pixel, gap+starty*unit_pixel),
+								(unit_pixel-gap+startx*unit_pixel, unit_pixel-gap+starty*unit_pixel),
+								(gap+startx*unit_pixel, unit_pixel-gap+starty*unit_pixel)]
 			self.agent = rendering.FilledPolygon(agent_stlocation)
 			self.agent.set_color(1.0, 0, 0.0)	# red
 			self.viewer.add_geom(self.agent)
@@ -134,7 +136,9 @@ class GridWorld(gym.Env):
 	def reset(self):
 		# set all girds normal
 		# clear punish_grids and goal grid
-		self.state = np.array([0,0])
+		startx = self.start_grid[0][0]
+		starty = self.start_grid[0][1]
+		self.state = np.array([startx,starty])
 		return self.state
 
 
@@ -146,7 +150,6 @@ class GridWorld(gym.Env):
 
 	def set_start(self,x,y):
 		self.start_grid = [(x,y)]
-
 	
 
 	def close(self):
