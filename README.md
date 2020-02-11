@@ -1,18 +1,18 @@
-# gym_pygrid
+# Gymgrid
 
 The gridworld environment contains simple environments in RL book and compatible with OpenAI-gym.
 
 ## Installation
 
 ```
-pip install -r requirements.txt
+pip install gymgird
 ```
 
 ## Usage
 
 ```
 import gym
-import gym_pygrid
+import gymgrid
 env = env = gym.make('cliff-v0')
 for i_episode in range(20):
     observation = env.reset()
