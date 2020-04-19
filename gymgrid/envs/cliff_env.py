@@ -1,7 +1,6 @@
 import gym
 import numpy as np
-from gym.envs.classic_control import rendering
-from gymgrid.envs.general_grid import *
+from general_grid import *
 import time
 
 class Cliff(GridWorld):
@@ -10,8 +9,8 @@ class Cliff(GridWorld):
                        world_height=4, 
                        unit_pixel=40,
                        default_reward=-1,
-                       goal_reward=100,
-                       punish_reward=-10,
+                       goal_reward=0,
+                       punish_reward=-100,
                        windy = False):
         super().__init__(world_width, 
                        world_height, 
@@ -29,6 +28,7 @@ class Cliff(GridWorld):
 if __name__ == '__main__':
     env = Cliff()
     # nfs = env.observation_space
+    # print(nfs)
     # nfa = env.action_space
     # print("nfs:%s; nfa:%s"%(nfs,nfa))
     # print(env.observation_space)
@@ -41,8 +41,10 @@ if __name__ == '__main__':
             print(observation)
             action = env.action_space.sample()
             observation, reward, done, info = env.step(action)
+            time.sleep(0.1)
             if done:
                 print("Episode finished after {} timesteps".format(t+1))
+                env.render()
                 time.sleep(0.3)
                 break
     env.close()

@@ -5,6 +5,13 @@ register(
     entry_point='gymgird.envs:GridWorld',
 )
 
+
+register(
+    id='windy-grid-world-v0',
+    entry_point='gymgird.envs:WindyGridWorld',
+)
+
+
 register(
     id='cliff-v0',
     entry_point='gymgrid.envs:Cliff',

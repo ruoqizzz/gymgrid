@@ -23,12 +23,15 @@ class GridWorld(gym.Env):
 		self.goal_reward = goal_reward
 		self.punish_reward = punish_reward
 
+		self.windy = windy
+		if self.windy:
+			self.wind = np.zeros(world_width)
+
 		# spaces
 		# 0,1,2,3,4: left, right, up, down and -
 		self.action_space = gym.spaces.Discrete(4)
-		# self.observation_space = gym.spaces.Discrete(self.world_height*self.world_width)
-		self.observation_space = gym.spaces.MultiDiscrete([self.world_width, self.world_height])
-
+		self.observation_space = gym.spaces.Discrete(self.world_height*self.world_width)
+		# self.observation_space = gym.spaces.MultiDiscrete([self.world_width, self.world_height])
 		# special grids
 		self.start_grid = [(0,0)]	# default start point
 		self.punish_grids = []	# reward value: punish_reward, start from (0,0)
@@ -79,8 +82,8 @@ class GridWorld(gym.Env):
 				self.viewer.add_geom(goal)
 				self.goals.append(goal)
 			# Draw agent: red rect
-			startx = self.start_grid[0][0]
-			starty = self.start_grid[0][1]
+			startx = 0
+			starty = 0
 			agent_stlocation = [(gap+startx*unit_pixel,gap+starty*unit_pixel),
 								(unit_pixel-gap+startx*unit_pixel, gap+starty*unit_pixel),
 								(unit_pixel-gap+startx*unit_pixel, unit_pixel-gap+starty*unit_pixel),
@@ -110,6 +113,17 @@ class GridWorld(gym.Env):
 		elif action == 5: new_x,new_y = new_x+1,new_y-1
 		elif action == 6: new_x,new_y = new_x+1,new_y-1
 		elif action == 7: new_x,new_y = new_x+1,new_y+1
+
+		# boundaries
+		if new_x < 0: new_x = 0
+		if new_x >= self.world_width: new_x = self.world_width-1
+		if new_y < 0: new_y = 0
+		if new_y >= self.world_height: new_y = self.world_height-1
+		
+		if self.windy:
+			print("wind: +",self.wind[new_x])
+			new_y += self.wind[new_x]
+
         # boundaries
 		if new_x < 0: new_x = 0
 		if new_x >= self.world_width: new_x = self.world_width-1
@@ -119,18 +133,20 @@ class GridWorld(gym.Env):
 		if (new_x, new_y) in self.goal_grid:
 			done = True
 			reward = self.goal_reward
+			self.state = np.array([new_x, new_y])
 		elif (new_x, new_y) in self.punish_grids:
-			done = True
+			done = False
 			reward = self.punish_reward
+			self.state = np.array([new_x, new_y])
+			self.render()
+			self.state = np.array([self.start_grid[0][0], self.start_grid[0][1]])
 		else:
 			done = False
 			reward = self.default_reward
-		# if done:
-		# 	self.state = None
-		# else: 
-		# 	self.state = np.array([new_x, new_y])
-		self.state = np.array([new_x, new_y])
-		return self.state, reward, done, {}  
+			self.state = np.array([new_x, new_y])
+
+		return self.get_obs(), reward, done, {}  
+		# return self.state, reward, done, {}  
 
 
 	def reset(self):
@@ -139,8 +155,12 @@ class GridWorld(gym.Env):
 		startx = self.start_grid[0][0]
 		starty = self.start_grid[0][1]
 		self.state = np.array([startx,starty])
-		return self.state
+		return self.get_obs()
+		# return self.state
 
+
+	def get_obs(self):
+		return self.state[0] + self.state[1]*self.world_height
 
 	def add_punish(self,x,y):
 		self.punish_grids.append((x,y))

@@ -32,4 +32,5 @@ print("env closed")
 
 - Sample1
 - Sample2
-- Cliff
+- Cliff: Example 6.5: Cliff Walking
+- WindyGridWorld: Exercise 6.9 Windy Gridworld with King's Moves
