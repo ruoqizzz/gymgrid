@@ -2,13 +2,13 @@ from gym.envs.registration import register
 
 register(
     id='grid-world-v0',
-    entry_point='gymgird.envs:GridWorld',
+    entry_point='gymgrid.envs:GridWorld',
 )
 
 
 register(
     id='windy-grid-world-v0',
-    entry_point='gymgird.envs:WindyGridWorld',
+    entry_point='gymgrid.envs:WindyGridWorld',
 )
 
 

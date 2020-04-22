@@ -1,6 +1,7 @@
 import gym
 import numpy as np
-from general_grid import *
+from gymgrid.envs.general_grid import *
+# from general_grid import *
 import time
 
 class WindyGridWorld(GridWorld):
@@ -38,13 +39,13 @@ if __name__ == '__main__':
 		observation = env.reset()
 		for t in range(100):
 			env.render()
-			print(observation)
+			# print(observation)
 			action = env.action_space.sample()
 			observation, reward, done, info = env.step(action)
 			time.sleep(0.2)
 			if done:
 				print("Episode finished after {} timesteps".format(t+1))
-				env.render()
+				# env.render()
 				time.sleep(1.0)
 				break
 	env.close()

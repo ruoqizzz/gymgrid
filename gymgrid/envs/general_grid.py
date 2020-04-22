@@ -121,7 +121,7 @@ class GridWorld(gym.Env):
 		if new_y >= self.world_height: new_y = self.world_height-1
 		
 		if self.windy:
-			print("wind: +",self.wind[new_x])
+			# print("wind: +",self.wind[new_x])
 			new_y += self.wind[new_x]
 
         # boundaries

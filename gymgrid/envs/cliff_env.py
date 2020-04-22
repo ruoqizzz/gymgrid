@@ -1,6 +1,6 @@
 import gym
 import numpy as np
-from general_grid import *
+from gymgrid.envs.general_grid import *
 import time
 
 class Cliff(GridWorld):
