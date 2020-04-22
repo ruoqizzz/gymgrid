@@ -1,7 +1,8 @@
 import gym
 import numpy as np
 from gym.envs.classic_control import rendering
-from gymgrid.envs.general_grid import *
+# from gymgrid.envs.general_grid import *
+from .general_grid import *
 
 def Sample1():
     env = GridWorld(world_width=4, world_height=4, goal_reward=0)

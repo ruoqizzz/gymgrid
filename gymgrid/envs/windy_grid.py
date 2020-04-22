@@ -1,7 +1,7 @@
 import gym
 import numpy as np
-from gymgrid.envs.general_grid import *
-# from general_grid import *
+# from gymgrid.envs.general_grid import *
+from .general_grid import *
 import time
 
 class WindyGridWorld(GridWorld):
