@@ -160,7 +160,7 @@ class GridWorld(gym.Env):
 
 
 	def get_obs(self):
-		return self.state[0] + self.state[1]*self.world_height
+		return self.state[0]*self.world_height + self.state[1]
 
 	def add_punish(self,x,y):
 		self.punish_grids.append((x,y))
