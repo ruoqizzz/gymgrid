@@ -10,7 +10,7 @@ class WindyGridWorld(GridWorld):
 					   world_height=7, 
 					   unit_pixel=40,
 					   default_reward=-1,
-					   goal_reward=100,
+					   goal_reward=-1,
 					   punish_reward=-10,
 					   windy = True):
 		super().__init__(world_width, 

@@ -105,6 +105,11 @@ class GridWorld(gym.Env):
 		old_x = self.state[0]
 		old_y = self.state[1]
 		new_x, new_y = old_x, old_y
+
+		if self.windy:
+			new_y += self.wind[new_x]
+
+		# boundaries
 		if action == 0: new_x -= 1   # left
 		elif action == 1: new_x += 1   # right
 		elif action == 2: new_y += 1   # up
@@ -115,16 +120,6 @@ class GridWorld(gym.Env):
 		elif action == 7: new_x,new_y = new_x+1,new_y+1
 
 		# boundaries
-		if new_x < 0: new_x = 0
-		if new_x >= self.world_width: new_x = self.world_width-1
-		if new_y < 0: new_y = 0
-		if new_y >= self.world_height: new_y = self.world_height-1
-		
-		if self.windy:
-			# print("wind: +",self.wind[new_x])
-			new_y += self.wind[new_x]
-
-        # boundaries
 		if new_x < 0: new_x = 0
 		if new_x >= self.world_width: new_x = self.world_width-1
 		if new_y < 0: new_y = 0
