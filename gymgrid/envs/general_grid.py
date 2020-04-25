@@ -133,7 +133,6 @@ class GridWorld(gym.Env):
 			done = False
 			reward = self.punish_reward
 			self.state = np.array([new_x, new_y])
-			self.render()
 			self.state = np.array([self.start_grid[0][0], self.start_grid[0][1]])
 		else:
 			done = False
