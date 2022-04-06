@@ -1,29 +1,32 @@
+import time
+
 import gym
 import numpy as np
+
 from .general_grid import *
-import time
+
 
 class Cliff(GridWorld):
     """docstring for Cliff"""
-    def __init__(self, world_width=12, 
-                       world_height=4, 
-                       unit_pixel=40,
-                       default_reward=-1,
-                       goal_reward=0,
-                       punish_reward=-100,
-                       windy = False):
-        super().__init__(world_width, 
-                       world_height, 
-                       unit_pixel,
-                       default_reward,
-                       goal_reward,
-                       punish_reward,
-                       windy)
-        self.goal_grid = [(11,0)]
-        for i in range(1,11):
-            self.add_punish(i,0)
 
-        
+    def __init__(self, world_width=12,
+                 world_height=4,
+                 unit_pixel=40,
+                 default_reward=-1,
+                 goal_reward=0,
+                 punish_reward=-100,
+                 windy=False):
+        super().__init__(world_width,
+                         world_height,
+                         unit_pixel,
+                         default_reward,
+                         goal_reward,
+                         punish_reward,
+                         windy)
+        self.goal_grid = [(11, 0)]
+        for i in range(1, 11):
+            self.add_punish(i, 0)
+
 
 if __name__ == '__main__':
     env = Cliff()

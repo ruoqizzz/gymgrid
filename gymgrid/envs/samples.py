@@ -1,20 +1,20 @@
 import gym
 import numpy as np
-from gym.envs.classic_control import rendering
-# from gymgrid.envs.general_grid import *
+
 from .general_grid import *
+
 
 def Sample1():
     env = GridWorld(world_width=4, world_height=4, goal_reward=0)
     env.action_space = gym.spaces.Discrete(4)
-    env.goal_grid = [(0,3), (3,0)]
+    env.goal_grid = [(0, 3), (3, 0)]
     return env
 
 
 def Sample2():
     env = GridWorld(world_width=4, world_height=4, goal_reward=0)
     env.action_space = gym.spaces.Discrete(4)
-    env.goal_grid = [(0,3)]
+    env.goal_grid = [(0, 3)]
     return env
 
 
