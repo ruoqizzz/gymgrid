@@ -1,174 +1,196 @@
 import gym
 import numpy as np
-from gym.envs.classic_control import rendering
+
 
 class GridWorld(gym.Env):
-	metadata = {
+    metadata = {
         'render.modes': ['human', 'rgb_array'],
         'video.frames_per_second': 2
     }
 
-	def __init__(self, world_width=12, 
-					   world_height=4, 
-					   unit_pixel=40,
-					   default_reward=-1,
-					   goal_reward=100,
-					   punish_reward=-10,
-					   windy = False):
-		super(GridWorld, self).__init__()
-		self.world_width = world_width
-		self.world_height = world_height
-		self.unit_pixel = unit_pixel
-		self.default_reward = default_reward
-		self.goal_reward = goal_reward
-		self.punish_reward = punish_reward
+    def __init__(self, world_width=12,
+                 world_height=4,
+                 unit_pixel=40,
+                 default_reward=-1,
+                 goal_reward=100,
+                 punish_reward=-10,
+                 windy=False):
+        super(GridWorld, self).__init__()
+        self.world_width = world_width
+        self.world_height = world_height
+        self.unit_pixel = unit_pixel
+        self.default_reward = default_reward
+        self.goal_reward = goal_reward
+        self.punish_reward = punish_reward
 
-		self.windy = windy
-		if self.windy:
-			self.wind = np.zeros(world_width)
+        self.windy = windy
+        if self.windy:
+            self.wind = np.zeros(world_width)
 
-		# spaces
-		# 0,1,2,3,4: left, right, up, down and -
-		self.action_space = gym.spaces.Discrete(4)
-		self.observation_space = gym.spaces.Discrete(self.world_height*self.world_width)
-		# self.observation_space = gym.spaces.MultiDiscrete([self.world_width, self.world_height])
-		# special grids
-		self.start_grid = [(0,0)]	# default start point
-		self.punish_grids = []	# reward value: punish_reward, start from (0,0)
-		self.goal_grid = [(self.world_width-1, 0)]		# reward value: goal_reward
-		# GUI
-		self.viewer = None
-		self.state = None
-		# self.steps_beyond_done = None
+        # spaces
+        # 0,1,2,3,4: left, right, up, down and -
+        self.action_space = gym.spaces.Discrete(4)
+        self.observation_space = gym.spaces.Discrete(
+            self.world_height*self.world_width)
+        # self.observation_space = gym.spaces.MultiDiscrete([self.world_width, self.world_height])
+        # special grids
+        self.start_grid = [(0, 0)]  # default start point
+        self.punish_grids = []  # reward value: punish_reward, start from (0,0)
+        self.goal_grid = [(self.world_width-1, 0)]		# reward value: goal_reward
+        # GUI
+        self.screen = None
+        self.state = None
+        # self.steps_beyond_done = None
 
-	def render(self, mode='human'):
-		unit_pixel = self.unit_pixel
-		if self.viewer is None:
-			self.viewer = rendering.Viewer(self.world_width*unit_pixel, self.world_height*unit_pixel)
-			# Draw lines
-			for c in range(0, self.world_width*unit_pixel, unit_pixel):
-				x0, y0, x1, y1 = c, 0, c, self.world_height*unit_pixel
-				l = rendering.Line((x0,y0), (x1,y1))
-				l.set_color(0,0,0)
-				self.viewer.add_geom(l)
-			for r in range(0, self.world_height*unit_pixel, unit_pixel):
-				x0, y0, x1, y1 =  0, r, self.world_width*unit_pixel, r
-				l.set_color(0,0,0)
-				l = rendering.Line((x0,y0), (x1,y1))
-				self.viewer.add_geom(l)
+    def render(self, mode='human'):
+        import pygame
+        from pygame import gfxdraw
 
-			origin = np.array([unit_pixel/2, unit_pixel/2])
-			gap = 2 # 5 pixels gap between object and line
-			# Draw cliff: black rect
-			for i in range(len(self.punish_grids)):
-				(x,y) = self.punish_grids[i]
-				v = [(x*unit_pixel+gap, y*unit_pixel+gap),
-	                 ((x+1)*unit_pixel-gap, y*unit_pixel+gap),
-	                 ((x+1)*unit_pixel-gap, (y+1)*unit_pixel-gap),
-	                 (x*unit_pixel+gap, (y+1)*unit_pixel-gap)
-				]
-				rect = rendering.FilledPolygon(v)
-				rect.set_color(0,0,0)
-				self.viewer.add_geom(rect)
-			# Draw goal: yellow oval
-			self.goals = []
-			for i in range(len(self.goal_grid)):
-				goal = rendering.make_circle((unit_pixel-2*gap)/2)
-				goal.set_color(1,1,0) # yellow
-				goal_x, goal_y = self.goal_grid[i] 
-				goal_location = origin + np.array([unit_pixel*goal_x, unit_pixel*goal_y])
-				circletrans = rendering.Transform(translation=(goal_location[0],goal_location[1]))
-				goal.add_attr(circletrans)
-				self.viewer.add_geom(goal)
-				self.goals.append(goal)
-			# Draw agent: red rect
-			startx = 0
-			starty = 0
-			agent_stlocation = [(gap+startx*unit_pixel,gap+starty*unit_pixel),
-								(unit_pixel-gap+startx*unit_pixel, gap+starty*unit_pixel),
-								(unit_pixel-gap+startx*unit_pixel, unit_pixel-gap+starty*unit_pixel),
-								(gap+startx*unit_pixel, unit_pixel-gap+starty*unit_pixel)]
-			self.agent = rendering.FilledPolygon(agent_stlocation)
-			self.agent.set_color(1.0, 0, 0.0)	# red
-			self.viewer.add_geom(self.agent)
-			self.agent_trans = rendering.Transform()
-			self.agent.add_attr(self.agent_trans)
-		if self.state is None: return None
-		x = self.state[0]
-		y = self.state[1]
-		self.agent_trans.set_translation(x*unit_pixel, y*unit_pixel)
-		return self.viewer.render(return_rgb_array=mode == 'rgb_array')
+        world_width = self.world_width
+        world_height = self.world_height
+        unit_pixel = self.unit_pixel
 
-	def step(self, action):
-		assert self.action_space.contains(action), "%r (%s) invalid"%(action, type(action))
-		self.action = action
-		old_x = self.state[0]
-		old_y = self.state[1]
-		new_x, new_y = old_x, old_y
+        screen_width = world_width*unit_pixel
+        screen_height = world_height*unit_pixel
 
-		if self.windy:
-			new_y += self.wind[new_x]
+        scale = screen_width/world_width
+        if self.state is None:
+            return None
 
-		# boundaries
-		if action == 0: new_x -= 1   # left
-		elif action == 1: new_x += 1   # right
-		elif action == 2: new_y += 1   # up
-		elif action == 3: new_y -= 1   # down
-		elif action == 4: new_x,new_y = new_x-1,new_y+1
-		elif action == 5: new_x,new_y = new_x+1,new_y+1
-		elif action == 6: new_x,new_y = new_x-1,new_y-1
-		elif action == 7: new_x,new_y = new_x+1,new_y-1
+        #x = self.state
 
-		# boundaries
-		if new_x < 0: new_x = 0
-		if new_x >= self.world_width: new_x = self.world_width-1
-		if new_y < 0: new_y = 0
-		if new_y >= self.world_height: new_y = self.world_height-1
+        if self.screen is None:
+            pygame.init()
+            pygame.display.init()
+            self.screen = pygame.display.set_mode(
+                (screen_width, screen_height))
+        if self.clock is None:
+            self.clock = pygame.time.Clock()
 
-		if (new_x, new_y) in self.goal_grid:
-			done = True
-			reward = self.goal_reward
-			self.state = np.array([new_x, new_y])
-		elif (new_x, new_y) in self.punish_grids:
-			done = False
-			reward = self.punish_reward
-			self.state = np.array([new_x, new_y])
-			self.state = np.array([self.start_grid[0][0], self.start_grid[0][1]])
-		else:
-			done = False
-			reward = self.default_reward
-			self.state = np.array([new_x, new_y])
+        # Check if close button is pressed
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                done = True
+                return done
 
-		return self.get_obs(), reward, done, {}  
-		# return self.state, reward, done, {}  
+        self.surf = pygame.Surface((screen_width, screen_height))
+        self.surf.fill((255, 255, 255))
+        # draw lines on the screen for the pixels
+        for i in range(world_width):
+            gfxdraw.vline(self.surf, i*unit_pixel, 0, screen_height, (0, 0, 0))
+        for i in range(world_height):
+            gfxdraw.hline(self.surf, 0, screen_width, i*unit_pixel, (0, 0, 0))
+        gap = 2
+        # Draw cliff as a black rectangle
+        for i in range(len(self.punish_grids)):
+            x, y = self.punish_grids[i]
+            gfxdraw.box(self.surf, (x*unit_pixel+gap, y*unit_pixel+gap,
+                                    unit_pixel-2*gap, unit_pixel-2*gap), (0, 0, 0))
+        # draw the goals as a yellow filled oval
+        for i in range(len(self.goal_grid)):
+            x, y = self.goal_grid[i]
+            gfxdraw.filled_circle(self.surf, x*unit_pixel+unit_pixel//2, y *
+                                  unit_pixel+unit_pixel//2, unit_pixel//2 - 2*gap, (255, 255, 0))
+        # draw the agent as a red rectangle
+        agent_x, agent_y = self.state
+        #print(agent_x, agent_y)
+        gfxdraw.box(self.surf, (agent_x*unit_pixel+gap, agent_y *
+                                unit_pixel+gap, unit_pixel-2*gap, unit_pixel-2*gap), (255, 0, 0))
+        # flip y axis
+        #self.screen.blit(pygame.transform.flip(self.surf, False, True), (0, 0))
+        self.screen.blit(self.surf, (0, 0))
+        # pygame.display.flip()
+        if mode == 'human':
+            pygame.event.pump()
+            self.clock.tick(10)
+            pygame.display.flip()
+        if mode == 'rgb_array':
+            return np.transpose(np.array(pygame.surfarray.pixels3d(self.screen)), (1, 0, 2))
+        return False
 
+    def step(self, action):
+        assert self.action_space.contains(
+            action), "%r (%s) invalid" % (action, type(action))
+        self.action = action
+        old_x = self.state[0]
+        old_y = self.state[1]
+        new_x, new_y = old_x, old_y
 
-	def reset(self):
-		# set all girds normal
-		# clear punish_grids and goal grid
-		startx = self.start_grid[0][0]
-		starty = self.start_grid[0][1]
-		self.state = np.array([startx,starty])
-		return self.get_obs()
-		# return self.state
+        if self.windy:
+            new_y += self.wind[new_x]
 
+        # boundaries
+        if action == 0:
+            new_x -= 1   # left
+        elif action == 1:
+            new_x += 1   # right
+        elif action == 2:
+            new_y += 1   # up
+        elif action == 3:
+            new_y -= 1   # down
+        elif action == 4:
+            new_x, new_y = new_x-1, new_y+1
+        elif action == 5:
+            new_x, new_y = new_x+1, new_y+1
+        elif action == 6:
+            new_x, new_y = new_x-1, new_y-1
+        elif action == 7:
+            new_x, new_y = new_x+1, new_y-1
 
-	def get_obs(self):
-		return self.state[0]*self.world_height + self.state[1]
+        # boundaries
+        if new_x < 0:
+            new_x = 0
+        if new_x >= self.world_width:
+            new_x = self.world_width-1
+        if new_y < 0:
+            new_y = 0
+        if new_y >= self.world_height:
+            new_y = self.world_height-1
 
-	def add_punish(self,x,y):
-		self.punish_grids.append((x,y))
+        if (new_x, new_y) in self.goal_grid:
+            done = True
+            reward = self.goal_reward
+            self.state = np.array([new_x, new_y])
+        elif (new_x, new_y) in self.punish_grids:
+            done = False
+            reward = self.punish_reward
+            self.state = np.array([new_x, new_y])
+            self.state = np.array(
+                [self.start_grid[0][0], self.start_grid[0][1]])
+        else:
+            done = False
+            reward = self.default_reward
+            self.state = np.array([new_x, new_y])
 
-	def add_goal(self,x,y):
-		self.goal_grid.append((x,y))
+        return self.get_obs(), reward, done, {}
+        # return self.state, reward, done, {}
 
-	def set_start(self,x,y):
-		self.start_grid = [(x,y)]
-	
+    def reset(self):
+        # set all girds normal
+        # clear punish_grids and goal grid
+        startx = self.start_grid[0][0]
+        starty = self.start_grid[0][1]
+        self.state = np.array([startx, starty])
+        return self.get_obs()
+        # return self.state
 
-	def close(self):
-		if self.viewer:
-			self.viewer.close()
-			self.viewer = None
+    def get_obs(self):
+        return self.state[0]*self.world_height + self.state[1]
 
+    def add_punish(self, x, y):
+        self.punish_grids.append((x, y))
 
+    def add_goal(self, x, y):
+        self.goal_grid.append((x, y))
+
+    def set_start(self, x, y):
+        self.start_grid = [(x, y)]
+
+    def close(self):
+        if self.screen:
+            import pygame
+
+            pygame.display.quit()
+            pygame.quit()
+            self.isopen = False
