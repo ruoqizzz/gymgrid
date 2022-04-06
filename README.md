@@ -9,7 +9,7 @@ The gridworld environment contains simple environments in RL book and compatible
 ## Installation
 
 ```
-pip install gymgrid
+pip install gymgrid2
 ```
 
 ## Usage

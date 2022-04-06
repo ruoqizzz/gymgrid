@@ -4,7 +4,7 @@ from setuptools import setup
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-setup(name='gymgrid',
+setup(name='gymgrid2',
       version='1.2.0',
       author="Ruoqi Zhang",
       author_email="ruoqi.zhang.666@gmail.com",
