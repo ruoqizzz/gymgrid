@@ -17,7 +17,7 @@ pip install gymgrid2
 ```
 import gym
 import gymgrid
-env = env = gym.make('cliff-v0')
+env = gym.make('cliff-v0')
 for i_episode in range(20):
     observation = env.reset()
     for t in range(100):
