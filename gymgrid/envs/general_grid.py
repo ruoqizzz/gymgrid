@@ -40,6 +40,7 @@ class GridWorld(gym.Env):
         # GUI
         self.screen = None
         self.state = None
+        self.clock = None
         # self.steps_beyond_done = None
 
     def render(self, mode='human'):
