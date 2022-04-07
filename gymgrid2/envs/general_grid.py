@@ -99,8 +99,8 @@ class GridWorld(gym.Env):
         gfxdraw.box(self.surf, (agent_x*unit_pixel+gap, agent_y *
                                 unit_pixel+gap, unit_pixel-2*gap, unit_pixel-2*gap), (255, 0, 0))
         # flip y axis
-        #self.screen.blit(pygame.transform.flip(self.surf, False, True), (0, 0))
-        self.screen.blit(self.surf, (0, 0))
+        self.screen.blit(pygame.transform.flip(self.surf, False, True), (0, 0))
+        #self.screen.blit(self.surf, (0, 0))
         # pygame.display.flip()
         if mode == 'human':
             pygame.event.pump()
