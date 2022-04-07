@@ -1,5 +1,4 @@
-from gymgrid.envs.general_grid import GridWorld
-from gymgrid.envs.cliff_env import Cliff
-from gymgrid.envs.windy_grid import WindyGridWorld
-from gymgrid.envs.samples import Sample1
-from gymgrid.envs.samples import Sample2
+from gymgrid2.envs.cliff_env import Cliff
+from gymgrid2.envs.general_grid import GridWorld
+from gymgrid2.envs.samples import Sample1, Sample2
+from gymgrid2.envs.windy_grid import WindyGridWorld
