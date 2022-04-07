@@ -1,19 +1,23 @@
 # Gymgrid
 
+This is a fork from https://github.com/wsgdrfz/gymgrid. The original implementation does no longer work in the latest versions of gym due to the change from the pyglet renderer to pygame.
+
+
+
 The gridworld environment contains simple environments in RL book and compatible with OpenAI-gym.
 
 ## Installation
 
 ```
-pip install gymgird
+pip install gymgrid2
 ```
 
 ## Usage
 
 ```
 import gym
-import gymgrid
-env = env = gym.make('cliff-v0')
+import gymgrid2
+env = gym.make('cliff-v0')
 for i_episode in range(20):
     observation = env.reset()
     for t in range(100):
